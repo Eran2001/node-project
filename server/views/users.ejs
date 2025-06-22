@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Users</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+      }
+      h1 {
+        text-align: center;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      .form-section {
+        margin-bottom: 30px;
+      }
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      input,
+      select {
+        padding: 8px;
+        font-size: 16px;
+      }
+      button {
+        padding: 10px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+      }
+      button:hover {
+        background-color: #45a049;
+      }
+      .error {
+        color: red;
+        text-align: center;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-top: 20px;
+      }
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
+      th {
+        background-color: #f2f2f2;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Users List</h1>
+
+      <!-- Form to add a new user -->
+      <div class="form-section">
+        <h2>Add New User</h2>
+        <form id="addUserForm">
+          <input
+            type="text"
+            id="name"
+            name="name"
+            placeholder="Name"
+            required
+          />
+          <input
+            type="number"
+            id="age"
+            name="age"
+            placeholder="Age"
+            required
+            min="1"
+          />
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Password"
+            required
+          />
+          <select id="status" name="status" required>
+            <option value="" disabled selected>Select Status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+          <button type="submit">Add User</button>
+        </form>
+        <p id="error" class="error" style="display: none"></p>
+      </div>
+
+      <!-- Users table -->
+      <% if (users && users.length > 0) { %>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% users.forEach(user => { %>
+          <tr>
+            <td><%= user.id %></td>
+            <td><%= user.name %></td>
+            <td><%= user.age %></td>
+            <td><%= user.status %></td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+      <% } else { %>
+      <p style="text-align: center">No users found.</p>
+      <% } %>
+    </div>
+
+    <script>
+      const form = document.getElementById("addUserForm");
+      const errorElement = document.getElementById("error");
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        errorElement.style.display = "none";
+
+        const name = document.getElementById("name").value;
+        const age = document.getElementById("age").value;
+        const password = document.getElementById("password").value;
+        const status = document.getElementById("status").value;
+
+        try {
+          const response = await fetch("/users", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              name,
+              age: parseInt(age),
+              password,
+              status,
+            }),
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.error || "Failed to add user");
+          }
+
+          // Clear form
+          form.reset();
+
+          // Reload page to refresh user list
+          window.location.reload();
+        } catch (error) {
+          errorElement.textContent = error.message;
+          errorElement.style.display = "block";
+        }
+      });
+    </script>
+  </body>
+</html>
