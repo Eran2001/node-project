@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import API from "../services/index";
 import "./users.css";
 
 const Users = () => {
@@ -18,10 +18,7 @@ const Users = () => {
 
   const fetchUsers = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:3001/users", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await API.private.getUsers();
       setUsers(response.data);
     } catch (err) {
       setError("Failed to fetch users");
@@ -31,10 +28,7 @@ const Users = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem("token");
-      await axios.post("http://localhost:3001/users", formData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await API.private.createUser(formData);
       setFormData({ name: "", age: "", password: "", status: "active" });
       fetchUsers();
     } catch (err) {
@@ -44,8 +38,8 @@ const Users = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post("http://localhost:3002/auth/login", {
-        email: "test@example.com", // Replace with form input
+      const response = await API.public.login({
+        email: "test@example.com",
         password: "password",
       });
       localStorage.setItem("token", response.data.token);

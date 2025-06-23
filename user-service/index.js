@@ -1,6 +1,7 @@
 import express from "express";
 import apiRouter from "./routes/api.js";
 import pool from "./db/db.js";
+import cors from "cors";
 
 const app = express();
 const PORT = 5000;
@@ -9,6 +10,7 @@ const PORT = 5000;
 app.use(express.json());
 app.set("view engine", "ejs");
 app.set("views", "./views");
+app.use(cors());
 
 // Mount the API router
 app.use("/", apiRouter);

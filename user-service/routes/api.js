@@ -11,7 +11,7 @@ router.get("/", (req, res) => {
 router.get("/users", async (req, res) => {
   try {
     const [rows] = await pool.query("SELECT * FROM users");
-    res.render("users", { users: rows });
+    res.status(200).json(rows);
   } catch (error) {
     console.error("Error fetching users:", error.message);
     res.status(500).json({ error: "Internal Server Error" });
